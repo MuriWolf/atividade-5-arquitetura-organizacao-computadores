@@ -8,15 +8,16 @@ int main() {
 	int vowelsCount{ 0 };
 	int consonantsCount{ 0 };
 	int numbersCount{ 0 };
+	char character;
 
 	for (char i = 0; i < text.size(); i++)
 	{
-		char character = text[i];
+		character = text[i];
 
 		if (character == 32) {
 			spacesCount++;
 		}
-		else if (__ascii_isalpha(character)) {
+		else if (__builtin_isalpha(character)) {
 			if (isVowel(character) == 1) {
 				vowelsCount++;
 			}
@@ -24,15 +25,15 @@ int main() {
 				consonantsCount++;
 			}
 		}
-		else {
+		else if (isdigit(character)) {
 			numbersCount++;
 		}
 	}
 
-	std::cout << "\nspaces: " << spacesCount;
-	std::cout << "\nconsonants: " << consonantsCount;
-	std::cout << "\nvowels: " << vowelsCount;
-	std::cout << "\nnumbers: " << numbersCount;
+	std::cout << "Spaces: " << spacesCount << std::endl;
+	std::cout << "Consonants: " << consonantsCount << std::endl;
+	std::cout << "Vowels: " << vowelsCount << std::endl;
+	std::cout << "Numbers: " << numbersCount << std::endl;
 
 	return 0;
 }
