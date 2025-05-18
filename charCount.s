@@ -236,3 +236,7 @@ _start:
         mov rax, 60
         xor rdi, rdi
         syscall
+
+        pop rbx
+        mov rsp, rbp
+        ret
