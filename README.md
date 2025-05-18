@@ -18,3 +18,21 @@ Implemente um programa que realize a soma de duas matrizes 3x3 de números intei
 Inicializar duas matrizes 3x3 com valores pré-definidos
 Calcular a matriz resultante somando os elementos correspondentes
 Exibir as duas matrizes originais e a matriz resultante
+
+## Debug com gdb
+
+```
+gdb ./arquivo
+
+break _start     // adiciona breakpoint
+
+run
+
+layout asm      // adiciona visualização do assembly 
+
+layout split   // divide os layouts da tela (para caber o regs)
+
+layout regs    // adiciona visualização dos registradores
+
+si            // avança no assembly, ENTER pode ser usado depois do primiero 'si'
+```
