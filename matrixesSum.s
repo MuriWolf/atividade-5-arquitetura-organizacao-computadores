@@ -3,8 +3,11 @@
     rows: .int 3
     cols: .int 3
     num_buffer: .space 16
-    nl: .ascii "\n"
-    space: .ascii " "
+    nl: .asciz "\n"
+    space: .asciz " "
+    msg_matrix_one: .string "Matrix A: "
+    msg_matrix_two: .string "Matrix B: "
+    msg_matrix_sum: .string "Sum of matrix A and B: "
 
     matrix_one: 
         .int 1, 2, 3
@@ -65,7 +68,7 @@ int_to_string:
 print_cstring:
     push rdi          # Salva o endereço da string (rdi)
     call strlen       # Chama strlen, rax = tamanho da string
-    pop rsi           # Restaura o endereço da string para rsi (argumento 2 para sys_write)
+    pop rsi
     mov rdx, rax      # rdx = tamanho da string (argumento 3 para sys_write)
     mov rax, 1        # syscall sys_write
     mov rdi, 1        # stdout (file descriptor 1)
@@ -73,49 +76,51 @@ print_cstring:
     ret
 
 print_matrix:
-    push r12
-    mov r12, rdi
+    push r13
+    mov r13, rdi
 
-    xor ecx, ecx
-
-    # mov edi, OFFSET nl
-    # call print_cstring
-    
-.print_matrix_loop_rows:
-    cmp ecx, [rows]
-    je .end_print_matrix_loop_rows
     xor ebx, ebx
 
+    # SEGMENTATION FAULT ESTA NESSAS CHAMADAS AO PRINT_CSTRING, PROVAVELMENTE RELACIONADO COM O EDI/RDI
+
+    mov edi, OFFSET nl
+    call print_cstring
+    
+.print_matrix_loop_rows:
+    cmp ebx, [rows]
+    je .end_print_matrix_loop_rows
+    xor r14d, r14d
+
 .print_matrix_loop_cols:
-    cmp ebx, [cols]
+    cmp r14d, [cols]
     je .end_print_matrix_loop_cols
 
-    # mov r8d, dword ptr [matrix_one + (ecx*[cols] + ebx) * 4]
+    # mov r8d, dword ptr [matrix_one + (ebx*[cols] + r14d) * 4]
     # chega até o endereço atual na matrix
-    mov edx, ecx # edx = row
-    imul edx, [cols] # edx = row * cols
-    add edx, ebx # edx = row * cols + col
-    shl edx, 2 # edx = (row * cols + col) * 4
+    mov r12, rbx # r12 = row
+    imul r12, [cols] # r12 = row * cols
+    add r12, r14 # r12 = row * cols + col
+    shl r12, 2 # r12 = (row * cols + col) * 4
 
     # chama a função de print preservando a (matriz)
-    mov eax, dword ptr [r12 + rdx] # pega o valor da matriz escolhida
-    # call int_to_string
-    # call print_cstring
-    # mov edi, OFFSET space
-    # call print_cstring
+    mov eax, dword ptr [r13 + r12] # pega o valor da matriz escolhida
+    call int_to_string
+    call print_cstring
+    mov edi, OFFSET space
+    call print_cstring
 
-    inc ebx
+    inc r14d
     jmp .print_matrix_loop_cols
 
 .end_print_matrix_loop_cols:
-    # mov edi, OFFSET nl
-    # call print_cstring
+    mov edi, OFFSET nl
+    call print_cstring
 
-    inc ecx
+    inc ebx
     jmp .print_matrix_loop_rows
 
 .end_print_matrix_loop_rows:
-    pop r12
+    pop r13
     ret
 
 _start:
@@ -156,14 +161,29 @@ _start:
     jmp .loop_rows
 
 .end_loop_rows:
+
+    mov edi, OFFSET nl
+    call print_cstring
+    mov rdi, OFFSET msg_matrix_one
+    call print_cstring
     lea rdi, [matrix_one]
     call print_matrix
 
+    mov edi, OFFSET nl
+    call print_cstring
+    mov rdi, OFFSET msg_matrix_two
+    call print_cstring
     lea rdi, [matrix_two]
     call print_matrix
 
+    mov edi, OFFSET nl
+    call print_cstring
+    mov rdi, OFFSET msg_matrix_sum
+    call print_cstring
     lea rdi, [matrix_sum]
     call print_matrix
+
+    jmp .end
 
 .end:
     mov rax, 60

@@ -17,9 +17,14 @@ int main() {
 			matrixSum[row][col] = matrixOne[row][col] + matrixTwo[row][col];
 		}
 	}
-
+    
+    std::cout << "\nMatrix A: ";
 	printMatrix(matrixOne);
+	
+	std::cout << "\nMatrix B: ";
 	printMatrix(matrixTwo);
+	
+	std::cout << "\nSum of matrix A and B: ";
 	printMatrix(matrixSum);
 
 	return 0;
