@@ -81,8 +81,6 @@ print_matrix:
 
     xor ebx, ebx
 
-    # SEGMENTATION FAULT ESTA NESSAS CHAMADAS AO PRINT_CSTRING, PROVAVELMENTE RELACIONADO COM O EDI/RDI
-
     mov edi, OFFSET nl
     call print_cstring
     
@@ -95,7 +93,6 @@ print_matrix:
     cmp r14d, [cols]
     je .end_print_matrix_loop_cols
 
-    # mov r8d, dword ptr [matrix_one + (ebx*[cols] + r14d) * 4]
     # chega até o endereço atual na matrix
     mov r12, rbx # r12 = row
     imul r12, [cols] # r12 = row * cols
