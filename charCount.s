@@ -27,7 +27,6 @@ verify_is_number:
     movzx eax, byte ptr[rsi]
     test eax, eax 
     jz .end_verify_is_number
-
     # se nao for maior que 9 nem menor que 0, é um número
     cmp al, '0'
     jb .non_number
@@ -39,12 +38,12 @@ verify_is_number:
     mov eax, 1
     jmp .end_verify_is_number
 
-    # retorna 0 se negativo
-    .non_number:
-        mov eax, 0
+# retorna 0 se negativo
+.non_number:
+    mov eax, 0
 
-    .end_verify_is_number:
-        ret
+.end_verify_is_number:
+    ret
 
 verify_is_alphabetic:
     # verifica se há caracter
@@ -62,12 +61,12 @@ verify_is_alphabetic:
     mov eax, 1
     jmp .end_verify_is_alphabetic
 
-    # 0 caso não
-    .non_aphabetic:
-        mov eax, 0
+# 0 caso não
+.non_aphabetic:
+    mov eax, 0
 
-    .end_verify_is_alphabetic: 
-        ret
+.end_verify_is_alphabetic: 
+    ret
 
 verify_is_vowel:
     xor edx, edx # iniciar registrador contador como zero
@@ -75,27 +74,27 @@ verify_is_vowel:
     test eax, eax
     jz .end_verify_is_vowel
 
-    .loop_verify_vowel:
-        # compara o valor do array de vogais com o caracter
-        lea r8d, [vowels + edx*4]
-        or eax, 0x20
-        cmp eax, [r8d]
-        jnz .non_vowel
+.loop_verify_vowel:
+    # compara o valor do array de vogais com o caracter
+    lea r8d, [vowels + edx*4]
+    or eax, 0x20
+    cmp eax, [r8d]
+    jnz .non_vowel
 
-        mov eax, 1
-        jmp .end_verify_is_vowel
+    mov eax, 1
+    jmp .end_verify_is_vowel
 
-    .non_vowel:
-        # verifica se ainda há vogais para comparar
-        inc edx
-        cmp edx, [vowels_len]
-        jl .loop_verify_vowel
+.non_vowel:
+    # verifica se ainda há vogais para comparar
+    inc edx
+    cmp edx, [vowels_len]
+    jl .loop_verify_vowel
 
-        # se nao, retornar 0
-        mov eax, 0
+    # se nao, retornar 0
+    mov eax, 0
 
-    .end_verify_is_vowel:
-        ret
+.end_verify_is_vowel:
+    ret
 
 strlen:
     xor rax, rax      # Inicializa contador de comprimento
@@ -148,95 +147,88 @@ _start:
     xor ecx, ecx # iniciar registrador contador como zero
     lea rbx, [text] # character holder
 
-    .loop_verify_text:
-        lea rsi, [rbx + rcx] # pega char do text
+.loop_verify_text:
+    lea rsi, [rbx + rcx] # pega char do text
+    mov r9b, byte ptr [rsi]
+    cmp r9b, 0
+    je .print_results
 
-        mov r9b, byte ptr [rsi]
-        cmp r9b, 0
-        je .print_results
+    jmp .is_space
 
-        jmp .is_space
+.is_space:
+    # 0x20 representa o espaço
+    cmp r9b, 0x20
+    jnz .is_char
 
-    .is_space:
-        # 0x20 representa o espaço
-        cmp r9b, 0x20
-        jnz .is_char
-        add dword ptr [spaces_count], 1
-        jmp .next_char
+    add dword ptr [spaces_count], 1
+    jmp .next_char
 
-    .is_char:
-        # caso a função retorne 1, pode continuar pois é um char, do contráro, verificar se é um number
-        call verify_is_alphabetic
-        cmp eax, 1
-        jnz .is_number
+.is_char:
+    # caso a função retorne 1, pode continuar pois é um char, do contráro, verificar se é um number
+    call verify_is_alphabetic
+    cmp eax, 1
+    jnz .is_number
 
-        # caso a funcao retorne 1, é vowel
-        call verify_is_vowel
-        cmp eax, 1
-        jnz .is_not_vowel
+    # caso a funcao retorne 1, é vowel
+    call verify_is_vowel
+    cmp eax, 1
+    jnz .is_not_vowel
 
-        add dword ptr [vowels_count], 1
-        jmp .next_char
+    add dword ptr [vowels_count], 1
+    jmp .next_char
 
-    .is_not_vowel:
-        add dword ptr [consonants_count], 1
-        jmp .next_char
+.is_not_vowel:
+    add dword ptr [consonants_count], 1
+    jmp .next_char
 
-    .is_number:
-        # caso a funcao retorne 1, é number, se nao, apenas vai para o proximo caracter (pois especiais não estão sendo considerados)
-        call verify_is_number 
-        cmp eax, 1
-        jnz .next_char 
+.is_number:
+    # caso a funcao retorne 1, é number, se nao, apenas vai para o proximo caracter (pois especiais não estão sendo considerados)
+    call verify_is_number 
+    cmp eax, 1
+    jnz .next_char 
 
-        add dword ptr [numbers_count], 1
-        jmp .next_char
+    add dword ptr [numbers_count], 1
+    jmp .next_char
 
-    .next_char:
-        inc ecx # i++
-        jmp .loop_verify_text
+.next_char:
+    inc ecx # i++
+    jmp .loop_verify_text
 
-    .print_results:
-        # print spaces
-        mov rdi, OFFSET msg_spaces
-        call print_cstring
-        mov eax, [spaces_count]
-        call int_to_string
-        call print_cstring
-        mov edi, OFFSET newline
-        call print_cstring
+.print_results:
+    # print spaces
+    mov rdi, OFFSET msg_spaces
+    call print_cstring
+    mov eax, [spaces_count]
+    call int_to_string
+    call print_cstring
+    mov edi, OFFSET newline
+    call print_cstring
+    # print consonants
+    mov rdi, OFFSET msg_consonants
+    call print_cstring
+    mov eax, [consonants_count]
+    call int_to_string
+    call print_cstring
+    mov edi, OFFSET newline
+    call print_cstring
+    # print vowels
+    mov rdi, OFFSET msg_vowels
+    call print_cstring
+    mov eax, [vowels_count]
+    call int_to_string
+    call print_cstring
+    mov edi, OFFSET newline
+    call print_cstring
+    # print numbers
+    mov rdi, OFFSET msg_numbers
+    call print_cstring
+    mov eax, [numbers_count]
+    call int_to_string
+    call print_cstring
+    mov edi, OFFSET newline
+    call print_cstring
 
-        # print consonants
-        mov rdi, OFFSET msg_consonants
-        call print_cstring
-        mov eax, [consonants_count]
-        call int_to_string
-        call print_cstring
-        mov edi, OFFSET newline
-        call print_cstring
-
-        # print vowels
-        mov rdi, OFFSET msg_vowels
-        call print_cstring
-        mov eax, [vowels_count]
-        call int_to_string
-        call print_cstring
-        mov edi, OFFSET newline
-        call print_cstring
-
-        # print numbers
-        mov rdi, OFFSET msg_numbers
-        call print_cstring
-        mov eax, [numbers_count]
-        call int_to_string
-        call print_cstring
-        mov edi, OFFSET newline
-        call print_cstring
-    
-    .end:
-        mov rax, 60
-        xor rdi, rdi
-        syscall
-
-        pop rbx
-        mov rsp, rbp
-        ret
+.end:
+    mov rax, 60
+    xor rdi, rdi
+    syscall
