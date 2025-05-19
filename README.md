@@ -19,6 +19,24 @@ Inicializar duas matrizes 3x3 com valores pré-definidos
 Calcular a matriz resultante somando os elementos correspondentes
 Exibir as duas matrizes originais e a matriz resultante
 
+## Rodando os códigos
+Feito no ZorinOS, testado no Ubuntu.
+
+### Assembly
+```
+as matrixesSum.s -o matrixesSum.o
+gcc -o matrixesSum matrixesSum.o -nostdlib -static
+./matrixesSum
+```
+De forma análoga no outro arquivo.
+
+### C++
+```
+g++ matrixesSum.cpp -o matrixesSumCpp
+./matrixesSumCpp
+```
+De forma análoga no outro arquivo.
+
 ## Debug com gdb
 
 ```
